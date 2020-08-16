@@ -3,6 +3,8 @@
 Remix of: https://github.com/carykh/VirusGame  
 (This project fall under the same licence as the original project)
 
+You can downloads relases [here](https://github.com/Fox2Code/VirusGameHQ/releases)
+
 ## Changes
 
 - Smoother graphics / scroll
