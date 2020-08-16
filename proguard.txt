@@ -1,0 +1,9 @@
+-dontskipnonpubliclibraryclasses
+-libraryjars <java.home>/lib/rt.jar
+-forceprocessing
+-dontobfuscate
+-keepparameternames
+-ignorewarnings
+-dontwarn
+-keep class remix.** { *; }
+-keep class processing.awt.PGraphicsJava2D

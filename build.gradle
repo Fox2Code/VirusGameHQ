@@ -1,0 +1,58 @@
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.0.0'
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    shadow
+}
+
+jar {
+    from {
+        configurations.shadow.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    exclude 'processing/opengl/**'
+    manifest {
+        attributes 'Main-Class': 'remix.Main'
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation('org.processing:core:3.3.7') { transitive = false }
+    shadow('org.processing:core:3.3.7') { transitive = false }
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+task proguard(type: ProGuardTask) {
+    configuration 'proguard.txt'
+    injars "build/libs/VirusRemix-${version}.jar"
+    outjars "build/libs/VirusGameHQ-${version}.jar"
+}
+
+proguard.dependsOn(jar)
+build.dependsOn(proguard)
