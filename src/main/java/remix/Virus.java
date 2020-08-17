@@ -5,7 +5,8 @@ import processing.core.PFont;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -19,6 +20,8 @@ public class Virus extends PApplet {
     int WORLD_SIZE = 12;
     int W_W = 1728;
     int W_H = 972;
+    int WORLD_W = W_H;
+    int WORLD_H = W_H;
     int foodLimit = 180;
     Cell[][] cells = new Cell[WORLD_SIZE][WORLD_SIZE];
     CopyOnWriteArrayList<Particle> foods = new CopyOnWriteArrayList<>();
@@ -125,21 +128,20 @@ public class Virus extends PApplet {
     double camS = MIN_CAM_S;
     double camSReal = camS;
     public int tickCount;
+    int tickSpeed = 1;
     //final Object waitLock = new Object();
     final Object waitLock2 = new Object();
-    public void draw(){
+    public void draw() {
         // doParticleCountControl();
         // iterate();
         detectInput();
         drawBackground();
-        //synchronized (waitLock) {
-            drawCells();
-            drawParticles();
-            drawExtras();
-            synchronized (waitLock2) {
-                waitLock2.notify();
-            }
-        //}
+        drawCells();
+        drawParticles();
+        drawExtras();
+        synchronized (waitLock2) {
+            waitLock2.notify();
+        }
         drawUI();
     }
     public void tickAsync(){
@@ -149,11 +151,12 @@ public class Virus extends PApplet {
                 synchronized (waitLock2) {
                     waitLock2.wait(18L);
                 }
-                //synchronized (waitLock) {
+                int tickLoop = (tickSpeed==0 ? 0 : (1<<(tickSpeed-1)));
+                while (tickLoop-->0) {
                     doParticleCountControl();
                     iterate();
                     tickCount++;
-                //}
+                }
             }
         } catch (InterruptedException ignored) {}
 
@@ -224,7 +227,14 @@ public class Virus extends PApplet {
         for(int z = 0; z < 3; z++){
             Collection<Particle> sparticles = particles[z];
             for (Particle p : sparticles) {
-                p.drawParticle(trueXtoAppX(p.coor[0]), trueYtoAppY(p.coor[1]), trueStoAppS(1));
+                double trueX = trueXtoAppX(p.coor[0]);
+                double trueY = trueYtoAppY(p.coor[1]);
+                double scale = trueStoAppS(1);
+                double vSize = scale * 0.05F;
+                if (trueX < -vSize || trueY < -vSize || trueX > WORLD_W+vSize|| trueY > WORLD_H+vSize) {
+                    continue;
+                }
+                p.drawParticle(trueX, trueY, scale);
             }
         }
     }
@@ -328,6 +338,15 @@ public class Virus extends PApplet {
                     clickWorldY = appYtoTrueY(mouseY);
                     canDrag = true;
                 }else{
+                    if (mouseY > 120 && mouseY < 150) {
+                        for (int i = 0; i < 4; i++) {
+                            int decl = W_H + 10 + (i * 85);
+                            if (mouseX > decl && mouseX < decl + 70) {
+                                tickSpeed = i;
+                                break;
+                            }
+                        }
+                    }
                     if(selectedCell != null){
                         if(codonToEdit[0] >= 0){
                             checkETclick();
@@ -497,6 +516,7 @@ public class Virus extends PApplet {
         }
         popMatrix();
         drawUGObutton((selectedCell != UGOcell));
+        drawTimeButtons();
     }
     public void drawUGObutton(boolean drawUGO){
         fill(80);
@@ -689,8 +709,16 @@ public class Virus extends PApplet {
     }
     public void drawCells(){
         for(int y = 0; y < WORLD_SIZE; y++){
+            double appY = trueYtoAppY(y);
+            if (appY > WORLD_H || trueYtoAppY(y+1) < 0) {
+                continue;
+            }
             for(int x = 0; x < WORLD_SIZE; x++){
-                cells[y][x].drawCell(trueXtoAppX(x),trueYtoAppY(y),trueStoAppS(1));
+                double appX = trueXtoAppX(x);
+                if (appX > WORLD_W || trueXtoAppX(x+1) < 0) {
+                    continue;
+                }
+                cells[y][x].drawCell(appX,appY,trueStoAppS(1));
             }
         }
     }
@@ -1622,7 +1650,7 @@ public class Virus extends PApplet {
     public void settings() {  size(1728,972);  /* noSmooth(); */ smooth(2); }
     static public void main(String[] passedArgs) {
         String[] appletArgs = new String[] { "remix.Virus" };
-        if (passedArgs != null) {
+        if (passedArgs != null && passedArgs.length != 0) {
             PApplet.main(concat(appletArgs, passedArgs));
         } else {
             PApplet.main(appletArgs);
@@ -1667,6 +1695,18 @@ public class Virus extends PApplet {
             case RIGHT:
                 right = false;
                 break;
+        }
+    }
+
+    public void drawTimeButtons(){
+        noStroke();
+        textAlign(CENTER);
+        textFont(font,25);
+        for (int i = 0; i < 4; i++) {
+            fill(tickSpeed == i ? 120 : 80);
+            rect(W_H+10+(i*85),120,70,30);
+            fill(255);
+            text("x"+(i==0 ? 0 : (1<<(i-1))),W_H+45+(i*85),145);
         }
     }
 }

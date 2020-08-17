@@ -20,7 +20,9 @@ You can download releases [here](https://github.com/Fox2Code/VirusGameHQ/release
 - Standalone jar (Shrunk with ProGuard for smaller file size)  
   (No need to download processing)
 
-## Comparison
+- Configurable speed (x0, x1, x2, x4)
+
+## Graphics Comparison
 
 ### Before
 
