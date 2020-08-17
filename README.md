@@ -3,7 +3,7 @@
 Remix of: https://github.com/carykh/VirusGame  
 (This project fall under the same licence as the original project)
 
-You can downloads relases [here](https://github.com/Fox2Code/VirusGameHQ/releases)
+You can download releases [here](https://github.com/Fox2Code/VirusGameHQ/releases)
 
 ## Changes
 
@@ -17,4 +17,15 @@ You can downloads relases [here](https://github.com/Fox2Code/VirusGameHQ/release
 
 - Camera can move with arrow keys
 
-- Standalone jar (Shrunk with ProGuard for smaller file size)
+- Standalone jar (Shrunk with ProGuard for smaller file size)  
+  (No need to download processing)
+
+## Comparison
+
+### Before
+
+![](imgs/VirusGameBefore.png)
+
+### After
+
+![](imgs/VirusGameAfter.png)
